@@ -1,4 +1,4 @@
-package com.azki.auth.service;
+package com.azki.auth.config.service;
 
 import com.azki.auth.entity.User;
 import com.azki.auth.entity.UserRole;
