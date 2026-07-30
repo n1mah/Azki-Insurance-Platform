@@ -5,7 +5,7 @@ spring:
     name: auth-service
   datasource:
     url: jdbc:mysql://localhost:3306/auth_db
-    username: insurance_app
+    username: azki_app
     password: app_password
   jpa:
     hibernate:
