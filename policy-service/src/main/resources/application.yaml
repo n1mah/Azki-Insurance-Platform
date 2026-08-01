@@ -1,3 +1,38 @@
+server:
+  port: 8082
+
 spring:
   application:
-    name: policy
+    name: policy-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/policy_db
+    username: azki_app
+    password: app_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: ${JWT_SECRET:CHANGE_ME_IN_PRODUCTION_MIN_256_BITS_LONG_SECRET_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.azki.policy: DEBUG
