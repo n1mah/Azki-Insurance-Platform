@@ -29,14 +29,13 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         User user = userService.register(request.username(), request.password());
-        String token = jwtService.generateToken(user.getUsername(), user.getRole().name());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
+        String token = jwtService.generateToken(user.getId().toString(), user.getUsername(), user.getRole().name());        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = userService.authenticate(request.username(), request.password());
-        String token = jwtService.generateToken(user.getUsername(), user.getRole().name());
+        String token = jwtService.generateToken(user.getId().toString(), user.getUsername(), user.getRole().name());
         return ResponseEntity.ok(new AuthResponse(token));
     }
 

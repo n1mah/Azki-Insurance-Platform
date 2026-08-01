@@ -18,25 +18,27 @@ class JwtServiceTest {
         jwtService = new JwtService(TEST_SECRET, TEST_EXPIRATION_MS);
     }
 
-    @Test
-    void shouldGenerateTokenContainingUsernameAndRole() {
-        // given
-        String username = "nima_test";
-        String role = "CUSTOMER";
+@Test
+void shouldGenerateTokenContainingUserIdUsernameAndRole() {
+    // given
+    String userId = "user-id-123";
+    String username = "nima_test";
+    String role = "CUSTOMER";
 
-        // when
-        String token = jwtService.generateToken(username, role);
+    // when
+    String token = jwtService.generateToken(userId, username, role);
 
-        // then
-        assertThat(token).isNotBlank();
-        assertThat(jwtService.extractUsername(token)).isEqualTo(username);
-        assertThat(jwtService.extractRole(token)).isEqualTo(role);
-    }
+    // then
+    assertThat(token).isNotBlank();
+    assertThat(jwtService.extractUserId(token)).isEqualTo(userId);
+    assertThat(jwtService.extractUsername(token)).isEqualTo(username);
+    assertThat(jwtService.extractRole(token)).isEqualTo(role);
+}
 
     @Test
     void shouldValidateFreshlyGeneratedToken() {
         // given
-        String token = jwtService.generateToken("nima_test", "CUSTOMER");
+        String token = jwtService.generateToken("user-id-123", "nima_test", "CUSTOMER");
 
         // when
         boolean isValid = jwtService.isTokenValid(token);
@@ -48,7 +50,7 @@ class JwtServiceTest {
     @Test
     void shouldRejectTamperedToken() {
         // given
-        String token = jwtService.generateToken("nima_test", "CUSTOMER");
+        String token = jwtService.generateToken("user-id-123", "nima_test", "CUSTOMER");
         String tamperedToken = token.substring(0, token.length() - 5) + "AAAAA";
 
         // when
