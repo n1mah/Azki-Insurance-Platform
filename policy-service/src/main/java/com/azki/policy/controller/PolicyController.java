@@ -35,10 +35,10 @@ public class PolicyController {
 
     @PostMapping
     public ResponseEntity<PolicyResponse> issuePolicy(
-            @AuthenticationPrincipal String username,
-            @Valid @RequestBody IssuePolicyRequest request) {
+        @AuthenticationPrincipal String userIdString,
+        @Valid @RequestBody IssuePolicyRequest request) {
 
-        UUID userId = UUID.fromString(username);
+        UUID userId = UUID.fromString(userIdString);
         Policy policy = policyService.issuePolicy(userId, request.productId());
         return ResponseEntity.status(HttpStatus.CREATED).body(PolicyResponse.from(policy));
     }

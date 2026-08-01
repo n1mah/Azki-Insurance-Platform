@@ -18,8 +18,12 @@ public class JwtService {
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return parseClaims(token).getSubject();
+    }
+
+    public String extractUsername(String token) {
+        return parseClaims(token).get("username", String.class);
     }
 
     public String extractRole(String token) {
