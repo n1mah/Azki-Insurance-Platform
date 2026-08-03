@@ -1,6 +1,6 @@
 package com.azki.auth.config;
 
-import com.azki.auth.security.JwtAuthenticationFilter;
+import com.azki.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
