@@ -9,7 +9,7 @@ Six independent services, each owning its own data, communicating through REST (
 | Service | Responsibility | Status |
 |---|---|---|
 | `auth-service` | Authentication, JWT issuance | ✅ Complete and tested |
-| `policy-service` | Policy issuance and lookup | 🔲 Planned |
+| `policy-service` | Policy issuance and lookup | ✅ Complete and tested |
 | `claims-service` | Claims handling, optimistic locking | 🔲 Planned |
 | `payment-service` | Payments, event consumer | 🔲 Planned |
 | `notification-service` | SMS/email, fully async | 🔲 Planned |
