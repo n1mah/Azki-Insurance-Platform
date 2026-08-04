@@ -10,6 +10,7 @@ public record PolicyResponse(
         String productName,
         String status,
         BigDecimal premiumAmount,
+        String currency,
         LocalDate startDate,
         LocalDate endDate
 ) {
@@ -19,7 +20,8 @@ public record PolicyResponse(
                 policy.getId(),
                 policy.getProduct().getName(),
                 policy.getStatus().name(),
-                policy.getPremiumAmount(),
+                policy.getPremiumAmount().getAmount(),
+                policy.getPremiumAmount().getCurrency(),
                 policy.getStartDate(),
                 policy.getEndDate()
         );

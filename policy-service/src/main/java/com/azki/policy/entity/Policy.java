@@ -1,6 +1,10 @@
 package com.azki.policy.entity;
 
+import com.azki.policy.valueobject.Money;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -32,8 +35,12 @@ public class Policy {
     @Column(nullable = false)
     private PolicyStatus status;
 
-    @Column(name = "premium_amount", nullable = false)
-    private BigDecimal premiumAmount;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "premium_amount")),
+            @AttributeOverride(name = "currency", column = @Column(name = "premium_currency"))
+    })
+    private Money premiumAmount;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -44,8 +51,8 @@ public class Policy {
     protected Policy() {
     }
 
-    public Policy(UUID userId, InsuranceProduct product, BigDecimal premiumAmount,
-                  LocalDate startDate, LocalDate endDate) {
+    public Policy(UUID userId, InsuranceProduct product, Money premiumAmount,
+            LocalDate startDate, LocalDate endDate) {
         this.userId = userId;
         this.product = product;
         this.premiumAmount = premiumAmount;
@@ -78,7 +85,7 @@ public class Policy {
         return status;
     }
 
-    public BigDecimal getPremiumAmount() {
+    public Money getPremiumAmount() {
         return premiumAmount;
     }
 

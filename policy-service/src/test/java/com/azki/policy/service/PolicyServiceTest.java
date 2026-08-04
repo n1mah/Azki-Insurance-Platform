@@ -12,7 +12,9 @@ import com.azki.policy.exception.PolicyNotFoundException;
 import com.azki.policy.exception.ProductNotFoundException;
 import com.azki.policy.repository.InsuranceProductRepository;
 import com.azki.policy.repository.PolicyRepository;
+import com.azki.policy.valueobject.Money;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,7 +45,8 @@ class PolicyServiceTest {
         // given
         UUID userId = UUID.randomUUID();
         Long productId = 1L;
-        InsuranceProduct product = new InsuranceProduct("Car Body Insurance", new BigDecimal("1500.00"), "COMPREHENSIVE");
+        InsuranceProduct product = new InsuranceProduct(
+                "Car Body Insurance", Money.of(new BigDecimal("1500.00")), "COMPREHENSIVE");
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(policyRepository.save(any(Policy.class)))
@@ -55,7 +58,7 @@ class PolicyServiceTest {
         // then
         assertThat(result.getUserId()).isEqualTo(userId);
         assertThat(result.getProduct()).isEqualTo(product);
-        assertThat(result.getPremiumAmount()).isEqualByComparingTo("1500.00");
+        assertThat(result.getPremiumAmount().getAmount()).isEqualByComparingTo("1500.00");
         assertThat(result.getStatus()).isEqualTo(PolicyStatus.ACTIVE);
     }
 
@@ -75,9 +78,10 @@ class PolicyServiceTest {
     void shouldReturnPoliciesForGivenUser() {
         // given
         UUID userId = UUID.randomUUID();
-        InsuranceProduct product = new InsuranceProduct("Car Body Insurance", new BigDecimal("1500.00"), "COMPREHENSIVE");
-        Policy policy = new Policy(userId, product, new BigDecimal("1500.00"),
-                java.time.LocalDate.now(), java.time.LocalDate.now().plusYears(1));
+        InsuranceProduct product = new InsuranceProduct(
+                "Car Body Insurance", Money.of(new BigDecimal("1500.00")), "COMPREHENSIVE");
+        Policy policy = new Policy(userId, product, Money.of(new BigDecimal("1500.00")),
+                LocalDate.now(), LocalDate.now().plusYears(1));
 
         when(policyRepository.findByUserId(userId)).thenReturn(List.of(policy));
 
@@ -94,9 +98,10 @@ class PolicyServiceTest {
         // given
         UUID policyId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        InsuranceProduct product = new InsuranceProduct("Car Body Insurance", new BigDecimal("1500.00"), "COMPREHENSIVE");
-        Policy policy = new Policy(userId, product, new BigDecimal("1500.00"),
-                java.time.LocalDate.now(), java.time.LocalDate.now().plusYears(1));
+        InsuranceProduct product = new InsuranceProduct(
+                "Car Body Insurance", Money.of(new BigDecimal("1500.00")), "COMPREHENSIVE");
+        Policy policy = new Policy(userId, product, Money.of(new BigDecimal("1500.00")),
+                LocalDate.now(), LocalDate.now().plusYears(1));
 
         when(policyRepository.findById(policyId)).thenReturn(Optional.of(policy));
 

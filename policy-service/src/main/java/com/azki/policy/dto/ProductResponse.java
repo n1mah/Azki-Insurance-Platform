@@ -7,6 +7,7 @@ public record ProductResponse(
         Long id,
         String name,
         BigDecimal basePremiumRate,
+        String currency,
         String coverageType
 ) {
 
@@ -14,7 +15,8 @@ public record ProductResponse(
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
-                product.getBasePremiumRate(),
+                product.getBasePremiumRate().getAmount(),
+                product.getBasePremiumRate().getCurrency(),
                 product.getCoverageType()
         );
     }
