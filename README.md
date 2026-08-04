@@ -42,6 +42,15 @@ curl -X POST http://localhost:8081/api/auth/register \
   -d '{"username": "test_user", "password": "SecurePass123"}'
 ```
 
+## API Documentation
+
+Both completed services expose interactive Swagger UI once running:
+
+| Service | Swagger UI | OpenAPI JSON |
+|---|---|---|
+| `auth-service` | http://localhost:8081/swagger-ui.html | http://localhost:8081/v3/api-docs |
+| `policy-service` | http://localhost:8082/swagger-ui.html | http://localhost:8082/v3/api-docs |
+
 ## Project Structure
 
 ```

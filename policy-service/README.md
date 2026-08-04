@@ -30,6 +30,21 @@ curl -X GET http://localhost:8082/api/policies/products \
   -H "Authorization: Bearer $TOKEN"
 ```
 
+## API Documentation (Swagger UI)
+
+Once the service is running, interactive API documentation is available at:
+
+- Swagger UI: `http://localhost:8082/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8082/v3/api-docs`
+
+Every endpoint in this service requires a JWT. To call an endpoint directly from Swagger UI:
+
+1. Get a token from `auth-service` (`POST http://localhost:8081/api/auth/login`).
+2. Click **Authorize** at the top of the Swagger UI page.
+3. Paste the token value (without the `Bearer` prefix; Swagger UI adds it automatically).
+
+`SecurityFilterChainConfig` explicitly permits `/swagger-ui.html`, `/swagger-ui/**`, and `/v3/api-docs/**` so the documentation itself is reachable without a token, even though every actual API endpoint stays protected.
+
 ## API Reference
 
 | Method | Path | Auth required | Description |

@@ -42,6 +42,15 @@ Both endpoints return:
 }
 ```
 
+## API Documentation (Swagger UI)
+
+Once the service is running, interactive API documentation is available at:
+
+- Swagger UI: `http://localhost:8081/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8081/v3/api-docs`
+
+Both endpoints in this service (`register`, `login`) are public, so no token is required to try them from Swagger UI. A `bearerAuth` HTTP security scheme is still registered (`OpenApiConfig`) so that any future protected endpoint added to this service automatically exposes the "Authorize" button, without additional configuration.
+
 ## API Reference
 
 | Method | Path | Auth required | Description |
