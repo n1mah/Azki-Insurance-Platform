@@ -51,14 +51,14 @@ curl -X GET http://localhost:8082/api/policies/products \
 
 ```
 com.azki.policy
-├── entity/       JPA entities (InsuranceProduct, Policy, PolicyStatus)
-├── repository/   Spring Data JPA repositories
-├── dto/          Request/response records for the API layer
-├── exception/    Custom exceptions and the global exception handler
-├── security/     JwtService (verification only) and JwtAuthenticationFilter
-├── config/       Security filter chain and Redis cache configuration
-├── service/      Business logic (PolicyService)
-└── controller/   REST endpoints (PolicyController)
+├── entity/         JPA entities (InsuranceProduct, Policy, PolicyStatus)
+├── valueobject/    Money, an @Embeddable value object for monetary amounts
+├── repository/     Spring Data JPA repositories
+├── dto/            Request/response records for the API layer
+├── exception/      Custom exceptions and the global exception handler
+├── config/         Security filter chain and Redis cache configuration
+├── service/        Business logic (PolicyService)
+└── controller/     REST endpoints (PolicyController)
 ```
 
 ## Key Design Decisions
@@ -75,7 +75,6 @@ Consistent with the database-per-service pattern: `User` lives in `auth_db`, a s
 
 Unlike `userId`, `InsuranceProduct` lives in the same database (`policy_db`), so a genuine JPA relationship with a foreign key constraint is used here. This is a deliberate contrast: cross-database references use plain IDs, same-database references use real relations.
 
-### `JwtService` Only Verifies, Never Issues
 
 ### JWT Verification Comes From a Shared Starter, Not a Local Copy
 
@@ -127,8 +126,7 @@ Key properties in `application.yaml`:
 ## Known Gotchas Encountered While Building This Service
 
 - Redis's default cache serializer fails on JPA entities with `NotSerializableException`, since entities correctly don't implement `Serializable`. Fixed by configuring `GenericJacksonJsonRedisSerializer` explicitly.
-- `GenericJacksonJsonRedisSerializer` (Jackson 3-based, used in Spring Data Redis 4.1) has no public constructor; it must be built via `GenericJacksonJsonRedisSerializer.builder().build()`.
+- `GenericJacksonJsonRedisSerializer` (used for caching) has no public constructor in Spring Data Redis 4.1; it must be built via `.builder().build()`.
 - Testcontainers has no dedicated Redis module; a plain `GenericContainer` with the `redis:7-alpine` image is used instead.
 - Manually inserting non-ASCII data (e.g. Persian text) via `docker exec ... mysql -e "..."` requires the `--default-character-set=utf8mb4` flag on the client, or the text gets double-encoded and corrupted, even though the column itself is correctly configured as `utf8mb4`.
-- `GenericJacksonJsonRedisSerializer` (used for caching) has no public constructor in Spring Data Redis 4.1; it must be built via `.builder().build()`.
 - Changing the type of a field shared across entities, DTOs, and tests (e.g. `BigDecimal` to `Money`) touches every consumer atomically; no subset of those files compiles on its own, so the resulting commit is necessarily large.
