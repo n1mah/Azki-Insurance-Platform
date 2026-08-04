@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @Tag(name = "Authentication", description = "User registration and login")
 @RestController
@@ -31,6 +33,11 @@ public class AuthController {
     }
 
     @Operation(summary = "Register a new user", description = "Creates a user with the CUSTOMER role and returns a JWT")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation failed (blank username or short password)"),
+            @ApiResponse(responseCode = "409", description = "Username already exists")
+    })
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         User user = userService.register(request.username(), request.password());
@@ -39,6 +46,10 @@ public class AuthController {
         }
 
     @Operation(summary = "Authenticate an existing user", description = "Returns a fresh JWT on successful login")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Login successful"),
+        @ApiResponse(responseCode = "401", description = "Invalid username or password")
+    })
     @PostMapping("/login")
         public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = userService.authenticate(request.username(), request.password());
