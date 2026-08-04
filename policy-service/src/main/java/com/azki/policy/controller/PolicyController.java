@@ -2,7 +2,7 @@ package com.azki.policy.controller;
 
 import com.azki.policy.dto.IssuePolicyRequest;
 import com.azki.policy.dto.PolicyResponse;
-import com.azki.policy.entity.InsuranceProduct;
+import com.azki.policy.dto.ProductResponse;
 import com.azki.policy.entity.Policy;
 import com.azki.policy.service.PolicyService;
 import jakarta.validation.Valid;
@@ -29,8 +29,11 @@ public class PolicyController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<List<InsuranceProduct>> getAvailableProducts() {
-        return ResponseEntity.ok(policyService.getAvailableProducts());
+    public ResponseEntity<List<ProductResponse>> getAvailableProducts() {
+        List<ProductResponse> response = policyService.getAvailableProducts().stream()
+                .map(ProductResponse::from)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
