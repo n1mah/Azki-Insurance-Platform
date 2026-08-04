@@ -17,7 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+@Tag(name = "Policies", description = "Insurance product catalog and policy issuance")
 @RestController
 @RequestMapping("/api/policies")
 public class PolicyController {
@@ -29,6 +34,7 @@ public class PolicyController {
     }
 
     @GetMapping("/products")
+    @Operation(summary = "List available insurance products", description = "Cached; returns all products in the catalog")
     public ResponseEntity<List<ProductResponse>> getAvailableProducts() {
         List<ProductResponse> response = policyService.getAvailableProducts().stream()
                 .map(ProductResponse::from)
@@ -37,9 +43,15 @@ public class PolicyController {
     }
 
     @PostMapping
+    @Operation(summary = "Issue a new policy", description = "Creates a policy for the authenticated user against the given product")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Policy issued successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation failed (missing productId)"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ResponseEntity<PolicyResponse> issuePolicy(
-        @AuthenticationPrincipal String userIdString,
-        @Valid @RequestBody IssuePolicyRequest request) {
+            @AuthenticationPrincipal String userIdString,
+            @Valid @RequestBody IssuePolicyRequest request) {
 
         UUID userId = UUID.fromString(userIdString);
         Policy policy = policyService.issuePolicy(userId, request.productId());
@@ -47,6 +59,11 @@ public class PolicyController {
     }
 
     @GetMapping("/{policyId}")
+    @Operation(summary = "Get a policy by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Policy found"),
+            @ApiResponse(responseCode = "404", description = "Policy not found")
+    })
     public ResponseEntity<PolicyResponse> getPolicy(@PathVariable UUID policyId) {
         Policy policy = policyService.getPolicyById(policyId);
         return ResponseEntity.ok(PolicyResponse.from(policy));
