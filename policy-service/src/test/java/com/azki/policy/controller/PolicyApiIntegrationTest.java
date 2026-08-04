@@ -127,6 +127,26 @@ class PolicyApiIntegrationTest {
         }
 
         @Test
+        void shouldReturnNotFoundWhenPolicyBelongsToAnotherUser() throws Exception {
+                String ownerToken = generateTestToken(UUID.randomUUID());
+                String requestBody = "{\"productId\": " + existingProductId + "}";
+
+                String responseBody = mockMvc.perform(post("/api/policies")
+                                .header("Authorization", "Bearer " + ownerToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                                .andExpect(status().isCreated())
+                                .andReturn().getResponse().getContentAsString();
+
+                String policyId = responseBody.split("\"id\":\"")[1].split("\"")[0];
+                String otherUserToken = generateTestToken(UUID.randomUUID());
+
+                mockMvc.perform(get("/api/policies/" + policyId)
+                                .header("Authorization", "Bearer " + otherUserToken))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
         void shouldReturnNotFoundForNonExistentProduct() throws Exception {
                 String token = generateTestToken(UUID.randomUUID());
                 String requestBody = "{\"productId\": 999999}";

@@ -94,7 +94,7 @@ class PolicyServiceTest {
     }
 
     @Test
-    void shouldReturnPolicyWhenFoundById() {
+    void shouldReturnPolicyWhenFoundByIdAndOwnedByRequester() {
         // given
         UUID policyId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
@@ -106,7 +106,7 @@ class PolicyServiceTest {
         when(policyRepository.findById(policyId)).thenReturn(Optional.of(policy));
 
         // when
-        Policy result = policyService.getPolicyById(policyId);
+        Policy result = policyService.getPolicyById(policyId, userId);
 
         // then
         assertThat(result).isEqualTo(policy);
@@ -116,10 +116,29 @@ class PolicyServiceTest {
     void shouldThrowExceptionWhenPolicyNotFoundById() {
         // given
         UUID policyId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
         when(policyRepository.findById(policyId)).thenReturn(Optional.empty());
 
         // when / then
-        assertThatThrownBy(() -> policyService.getPolicyById(policyId))
+        assertThatThrownBy(() -> policyService.getPolicyById(policyId, userId))
+                .isInstanceOf(PolicyNotFoundException.class);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPolicyBelongsToAnotherUser() {
+        // given
+        UUID policyId = UUID.randomUUID();
+        UUID ownerId = UUID.randomUUID();
+        UUID requesterId = UUID.randomUUID();
+        InsuranceProduct product = new InsuranceProduct(
+                "Car Body Insurance", Money.of(new BigDecimal("1500.00")), "COMPREHENSIVE");
+        Policy policy = new Policy(ownerId, product, Money.of(new BigDecimal("1500.00")),
+                LocalDate.now(), LocalDate.now().plusYears(1));
+
+        when(policyRepository.findById(policyId)).thenReturn(Optional.of(policy));
+
+        // when / then
+        assertThatThrownBy(() -> policyService.getPolicyById(policyId, requesterId))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 

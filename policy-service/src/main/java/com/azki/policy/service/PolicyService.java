@@ -48,9 +48,15 @@ public class PolicyService {
         return policyRepository.findByUserId(userId);
     }
 
-    public Policy getPolicyById(UUID policyId) {
-        return policyRepository.findById(policyId)
+    public Policy getPolicyById(UUID policyId, UUID requesterId) {
+        Policy policy = policyRepository.findById(policyId)
                 .orElseThrow(() -> new PolicyNotFoundException(policyId));
+
+        if (!policy.getUserId().equals(requesterId)) {
+            throw new PolicyNotFoundException(policyId);
+        }
+
+        return policy;
     }
 
 }

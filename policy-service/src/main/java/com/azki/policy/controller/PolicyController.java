@@ -59,13 +59,16 @@ public class PolicyController {
     }
 
     @GetMapping("/{policyId}")
-    @Operation(summary = "Get a policy by ID")
+    @Operation(summary = "Get a policy by ID", description = "Returns 404 both when the policy does not exist and when it belongs to a different user")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Policy found"),
-            @ApiResponse(responseCode = "404", description = "Policy not found")
+            @ApiResponse(responseCode = "404", description = "Policy not found or not owned by the caller")
     })
-    public ResponseEntity<PolicyResponse> getPolicy(@PathVariable UUID policyId) {
-        Policy policy = policyService.getPolicyById(policyId);
+    public ResponseEntity<PolicyResponse> getPolicy(
+            @AuthenticationPrincipal String userIdString,
+            @PathVariable UUID policyId) {
+        UUID userId = UUID.fromString(userIdString);
+        Policy policy = policyService.getPolicyById(policyId, userId);
         return ResponseEntity.ok(PolicyResponse.from(policy));
     }
 
