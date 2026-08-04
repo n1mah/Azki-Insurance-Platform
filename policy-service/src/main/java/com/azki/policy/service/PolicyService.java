@@ -17,6 +17,7 @@ public class PolicyService {
 
     private final PolicyRepository policyRepository;
     private final InsuranceProductRepository productRepository;
+    private static final int DEFAULT_POLICY_DURATION_YEARS = 1;
 
     public PolicyService(PolicyRepository policyRepository, InsuranceProductRepository productRepository) {
         this.policyRepository = policyRepository;
@@ -37,8 +38,7 @@ public class PolicyService {
                 product,
                 product.getBasePremiumRate(),
                 LocalDate.now(),
-                LocalDate.now().plusYears(1)
-        );
+                LocalDate.now().plusYears(DEFAULT_POLICY_DURATION_YEARS));
         policy.activate();
 
         return policyRepository.save(policy);
