@@ -77,7 +77,9 @@ Unlike `userId`, `InsuranceProduct` lives in the same database (`policy_db`), so
 
 ### `JwtService` Only Verifies, Never Issues
 
-This service never logs a user in or registers one; it only needs to confirm that a token presented to it was legitimately issued by `auth-service`. Its `JwtService` therefore has no `generateToken` method, only `extractUserId`, `extractUsername`, `extractRole`, and `isTokenValid`. The signing secret must match `auth-service`'s exactly, since HMAC is symmetric.
+### JWT Verification Comes From a Shared Starter, Not a Local Copy
+
+This service never logs a user in or registers one; it only needs to confirm that a token presented to it was legitimately issued by `auth-service`. `JwtService` and `JwtAuthenticationFilter` used to be duplicated verbatim between this service and `auth-service`. They now live in a separate library, `azki-security-spring-boot-starter`, published to a self-hosted Nexus repository and pulled in as a normal Maven dependency. Adding the dependency is enough; `SecurityAutoConfiguration` in the starter registers both beans automatically, no local `@Bean` definitions required. The signing secret must still match `auth-service`'s exactly, since HMAC verification is symmetric.
 
 ### Redis Cache Configured for JSON, Not Java Serialization
 
@@ -86,6 +88,10 @@ Spring's default cache serialization uses Java's built-in `Serializable` mechani
 ### No Role or Product Selection From the Client
 
 `IssuePolicyRequest` only accepts a `productId`. The user ID comes from the verified JWT, never from the request body, closing an obvious spoofing path. The premium amount is always computed from the product's `basePremiumRate` in the database, never accepted from the client.
+
+### Monetary Amounts Use a `Money` Value Object, Not Raw `BigDecimal`
+
+`InsuranceProduct.basePremiumRate` and `Policy.premiumAmount` are `Money`, an `@Embeddable` value object pairing a `BigDecimal` amount with a currency string. A `Money` cannot be constructed with a null or negative amount, and its `equals()` compares by numeric value (`compareTo`) rather than `BigDecimal.equals()`, which would otherwise treat `100.0` and `100.00` as unequal due to differing scale. DTOs expose `amount` and `currency` as separate fields rather than serializing the `Money` type itself.
 
 ## Testing
 
@@ -124,3 +130,5 @@ Key properties in `application.yaml`:
 - `GenericJacksonJsonRedisSerializer` (Jackson 3-based, used in Spring Data Redis 4.1) has no public constructor; it must be built via `GenericJacksonJsonRedisSerializer.builder().build()`.
 - Testcontainers has no dedicated Redis module; a plain `GenericContainer` with the `redis:7-alpine` image is used instead.
 - Manually inserting non-ASCII data (e.g. Persian text) via `docker exec ... mysql -e "..."` requires the `--default-character-set=utf8mb4` flag on the client, or the text gets double-encoded and corrupted, even though the column itself is correctly configured as `utf8mb4`.
+- `GenericJacksonJsonRedisSerializer` (used for caching) has no public constructor in Spring Data Redis 4.1; it must be built via `.builder().build()`.
+- Changing the type of a field shared across entities, DTOs, and tests (e.g. `BigDecimal` to `Money`) touches every consumer atomically; no subset of those files compiles on its own, so the resulting commit is necessarily large.
