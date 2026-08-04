@@ -15,6 +15,8 @@ Six independent services, each owning its own data, communicating through REST (
 | `notification-service` | SMS/email, fully async | 🔲 Planned |
 | `gateway-service` | Single entry point, rate limiting | 🔲 Planned |
 
+Additionally, `azki-security-spring-boot-starter` is a shared library (not a runnable service) consumed by both `auth-service` and `policy-service`.
+
 ## 2-Minute Quickstart
 
 Prerequisite: Docker Desktop installed and running.
@@ -77,6 +79,13 @@ Each service is covered at two levels:
 
 - **Unit tests** (JUnit 5 + Mockito) for business logic, without a database or Spring context.
 - **Integration tests** (MockMvc + Testcontainers) against a real, ephemeral MySQL instance, covering the full path from HTTP request through controller, service, and database.
+
+## Shared Infrastructure
+
+Beyond the per-service databases, the platform runs two pieces of shared infrastructure:
+
+- **Nexus Repository Manager** (`localhost:8085`) — a self-hosted Maven artifact repository. Used to publish and consume `azki-security-spring-boot-starter`, the platform's internal library for JWT verification.
+- **`azki-security-spring-boot-starter`** — a Spring Boot auto-configuration starter shared between `auth-service` and `policy-service`. It provides `JwtService` (token verification) and `JwtAuthenticationFilter` as auto-configured beans; consuming services only need the Maven dependency, no manual `@Bean` setup. `auth-service` additionally keeps a small `TokenIssuer` class of its own, since issuing tokens is not shared behavior.
 
 ## Notable Spring Boot 4 Changes (Documented for Interview Reference)
 
