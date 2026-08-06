@@ -43,15 +43,15 @@ public class AuthController {
         User user = userService.register(request.username(), request.password());
         String token = tokenIssuer.generateToken(user.getId().toString(), user.getUsername(), user.getRole().name());
         return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
-        }
+    }
 
     @Operation(summary = "Authenticate an existing user", description = "Returns a fresh JWT on successful login")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Login successful"),
-        @ApiResponse(responseCode = "401", description = "Invalid username or password")
+            @ApiResponse(responseCode = "200", description = "Login successful"),
+            @ApiResponse(responseCode = "401", description = "Invalid username or password")
     })
     @PostMapping("/login")
-        public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = userService.authenticate(request.username(), request.password());
         String token = tokenIssuer.generateToken(user.getId().toString(), user.getUsername(), user.getRole().name());
         return ResponseEntity.ok(new AuthResponse(token));
