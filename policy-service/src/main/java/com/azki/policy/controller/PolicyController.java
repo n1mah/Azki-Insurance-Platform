@@ -58,6 +58,16 @@ public class PolicyController {
         return ResponseEntity.status(HttpStatus.CREATED).body(PolicyResponse.from(policy));
     }
 
+    @GetMapping
+    @Operation(summary = "List the authenticated user's policies")
+    public ResponseEntity<List<PolicyResponse>> getMyPolicies(@AuthenticationPrincipal String userIdString) {
+        UUID userId = UUID.fromString(userIdString);
+        List<PolicyResponse> response = policyService.getPoliciesForUser(userId).stream()
+                .map(PolicyResponse::from)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/{policyId}")
     @Operation(summary = "Get a policy by ID", description = "Returns 404 both when the policy does not exist and when it belongs to a different user")
     @ApiResponses({
