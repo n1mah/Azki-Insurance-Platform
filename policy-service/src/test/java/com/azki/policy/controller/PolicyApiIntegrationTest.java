@@ -127,6 +127,30 @@ class PolicyApiIntegrationTest {
         }
 
         @Test
+        void shouldOnlyListOwnPolicies() throws Exception {
+                String ownerToken = generateTestToken(UUID.randomUUID());
+                String otherUserToken = generateTestToken(UUID.randomUUID());
+                String requestBody = "{\"productId\": " + existingProductId + "}";
+
+                mockMvc.perform(post("/api/policies")
+                                .header("Authorization", "Bearer " + ownerToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                                .andExpect(status().isCreated());
+
+                mockMvc.perform(post("/api/policies")
+                                .header("Authorization", "Bearer " + otherUserToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody))
+                                .andExpect(status().isCreated());
+
+                mockMvc.perform(get("/api/policies")
+                                .header("Authorization", "Bearer " + ownerToken))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.length()").value(1));
+        }
+        
+        @Test
         void shouldReturnNotFoundWhenPolicyBelongsToAnotherUser() throws Exception {
                 String ownerToken = generateTestToken(UUID.randomUUID());
                 String requestBody = "{\"productId\": " + existingProductId + "}";
