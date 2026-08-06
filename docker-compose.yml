@@ -40,7 +40,7 @@ services:
       timeout: 5s
       retries: 10
   nexus:
-    image: sonatype/nexus3:latest
+    image: sonatype/nexus3:3.94.1
     container_name: azki-nexus
     restart: unless-stopped
     ports:
