@@ -1,0 +1,1 @@
+CREATE INDEX idx_policies_user_id ON policies (user_id);
