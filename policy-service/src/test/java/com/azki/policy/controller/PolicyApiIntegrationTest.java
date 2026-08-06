@@ -91,7 +91,7 @@ class PolicyApiIntegrationTest {
         @Test
         void shouldRejectRequestWithoutToken() throws Exception {
                 mockMvc.perform(get("/api/policies/products"))
-                                .andExpect(status().isForbidden());
+                                .andExpect(status().isUnauthorized());
         }
 
         @Test
