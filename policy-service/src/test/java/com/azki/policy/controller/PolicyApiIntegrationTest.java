@@ -53,6 +53,8 @@ class PolicyApiIntegrationTest {
                 registry.add("spring.datasource.url", mysql::getJdbcUrl);
                 registry.add("spring.datasource.username", mysql::getUsername);
                 registry.add("spring.datasource.password", mysql::getPassword);
+                registry.add("spring.flyway.user", mysql::getUsername);
+                registry.add("spring.flyway.password", mysql::getPassword);
                 registry.add("spring.data.redis.host", redis::getHost);
                 registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
         }
