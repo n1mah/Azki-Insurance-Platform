@@ -12,4 +12,6 @@ target/
 # Environment
 .env
 *.log
-EOF
+
+# Project archive
+Azki-Insurance-Platform.zip
